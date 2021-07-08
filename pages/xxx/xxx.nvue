@@ -1,0 +1,664 @@
+<template>
+	<div class="page">
+		<div class="cover-view-center" v-if="distanceX==0">
+			<div :style="{ height: `${sysheight-60}px`,width: width }" ref="touch" @click="clickVideo(index)" @touchstart="ListTouchStart" @touchmove="ListTouchMove">
+				<div class="cover-view-right" v-if="distanceX==0">
+					<image class="img" @click.stop="tapAvater"></image>
+					<text class="right-text"> </text>
+					<image class="img" @click.stop="tapLove"></image>
+					<text class="right-text"> </text>
+					<image class="img" @click.stop="tapMsg"></image>
+					<text class="right-text"> </text>
+					<image class="img" @click.stop="tapShare"></image>
+					<text class="right-text"> </text>
+				</div>
+			</div>
+		</div>
+		<div class="swiper" ref="swiper">
+			<block v-for="(item, idx) in videoList" :key="idx">
+				<div class="video-box" :style="{ height: height }">
+					<!-- 视频渲染数预加载数影响性能 -->
+					<block v-if="Math.abs(index-idx)<=1"> 
+						<chunlei-video class="video" :src="item.src"  :height="height" :width="width" 
+							:play="item.flag" :gDuration="item.duration" :objectFit="item.objectFit"
+							:initialTime="item.initialTime" @pause="pauseVideo" :rotateImg="`//static/avatar.png`"
+						>
+						</chunlei-video>
+						<cover-view class="cover-view-left">
+							<text class="left-text">@{{item.at}}</text>
+							<text class="left-text">{{item.content}}</text>
+						</cover-view>
+						<cover-view class="cover-view-right">
+							<cover-image :src="item.avater" class="avater img" @click.stop="tapAvater" v-bind:id="item.id" ></cover-image>
+							<text class="right-text-avater">+</text>
+							<text class="right-text"></text>
+							<cover-image :src="item.check?'../../static/aixinRed.png':'../../static/aixin.png'" class="img" @click.stop="tapLove"></cover-image>
+							<text class="right-text">{{item.like}}</text>
+							<cover-image src="../../static/xiaoxi.png" class="img" @click.stop="tapMsg"></cover-image>
+							<text class="right-text">{{item.comment}}</text>
+							<cover-image src="../../static/share-fill.png" class="img" @click.stop="tapShare"></cover-image>
+							<text class="right-text">分享</text>
+						</cover-view>
+						
+					</block>
+				</div>
+				
+			</block>
+		</div>
+		<div class="left-div" :style="{ height: height,width: width,left:`${-parseInt(width)}px` }" ref="left"  @touchstart="ListTouchStart" @touchmove="ListTouchMove">
+			<text class="title-text" @click="clickbt">{{videoList[index].at}}</text>
+		</div>
+		<div class="right-div" :style="{ height: height,width: width,right:`${-parseInt(width)}px` }" ref="right"  @touchstart="ListTouchStart" @touchmove="ListTouchMove">
+			<text class="title-text">{{videoList[index].content}}</text>
+		</div>
+		<uni-popup ref="popup" type="bottom">
+			<view style="background-color: white;height: 1000rpx;border-radius: 10rpx;display: flex;">
+				<view style="margin-left: 350rpx;margin-top: 40rpx;display: flex;flex-direction: row;align-items: center;">
+					<text>评论</text>
+					<image style="margin-left:250rpx;width: 32rpx;height: 32rpx;" src="../../static/close.png" @click="closePopup"></image>
+				</view>
+				<scroll-view style="height: 800rpx;padding: 40rpx;" scroll-y>
+					<view >
+						<view v-for="(item,index) in commentList" :key="index" style="border-bottom:1px solid #e6e6e6;">
+							<view style=" display: flex;flex-direction: row;display: flex;align-items: center;">
+								<view style="width: 70rpx;height: 70rpx;border-radius: 50%;">
+									<image style="width: 70rpx;height: 70rpx;border-radius: 50%;" :src="item.send_user.avatar"></image>
+								</view>
+								<view style="width: 250rpx;height:100rpx;">
+									<text >{{item.send_user.nickname}}</text>
+									<text></text>
+								</view>
+								<view @click="toComment(item.id,item.send_user.id)">
+									<text style="font-size: 32rpx;">去评论</text>
+								</view>
+								<view style="margin-left: 20rpx;" @click="deleteCommentList(item.id,'1')" v-if="deleteStatus">
+									<text style="font-size: 32rpx;">删除</text>
+									
+								</view>
+							</view>
+							<view style="padding: 20rpx;">
+								<text style="font-size: 32rpx;">评论内容:</text>
+								<view style="padding: 5rpx;">
+								
+								<text style="font-size: 32rpx;">{{item.content}}</text>
+								</view>
+							</view>
+							
+							
+							<view v-for="item2 in item.comments" :key="item2.id">
+								<view style=" display: flex;flex-direction: row;display: flex;align-items: center;">
+									<view style="width: 70rpx;height: 70rpx;border-radius: 50%;">
+										<image style="width: 70rpx;height: 70rpx;border-radius: 50%;" :src="item2.send_user.avatar"></image>
+									</view>
+									<view style="width: 300rpx;height:100rpx;">
+										<text>{{item2.send_user.nickname}}</text>
+										<text></text>
+									</view>
+									<view @click="toComment(item.id,item2.send_user.id)">
+										<text style="font-size: 32rpx;">去评论</text>
+									</view>
+								</view>
+								<view style="padding: 20rpx;">
+									<text style="font-size: 32rpx;">回复{{item2.reply_user.nickname}}</text>
+									<text style="font-size: 32rpx;padding: 5rpx;">{{item2.content}}</text>
+								</view>
+					
+							</view>
+						</view>
+					</view>
+				</scroll-view>
+				<view style="height:100rpx;display: flex;flex-direction: row;display: flex;align-items: center;justify-content: space-between;">
+					<view style="width: 500rpx;height: 80rpx;margin-left: 20rpx;">
+						<uni-easyinput style="width: 500rpx;" v-model="comment" placeholder="请输入内容"></uni-easyinput>
+					</view>
+					
+					<button style="width: 200rpx;height: 80rpx;margin-right: 20rpx;" @click="comments">评论</button>
+				</view>
+			</view>
+		</uni-popup>
+		
+		<uni-popup ref="popupReplay" type="bottom">
+		    <view style="background-color: white;height: 200rpx;border-radius: 10rpx;display: flex;align-items: center;justify-content: space-between;">
+		    	<view style="height:200rpx;display: flex;flex-direction: row;display: flex;align-items: center;justify-content: space-between;">
+		    		<view style="width: 500rpx;height: 80rpx;">
+		    			<uni-easyinput style="width: 500rpx;" v-model="replay" placeholder="请输入内容"></uni-easyinput>
+		    		</view>
+		    		
+		    		<button style="width: 200rpx;height: 80rpx;margin-left: 20rpx;" @click="toReplay">评论</button>
+		    	</view>
+		    </view>
+		</uni-popup>
+		
+		<uni-popup ref="popupShare" type="share">
+		    <uni-popup-share title="分享到" @select="share"></uni-popup-share>
+		</uni-popup>
+	</div>
+</template>
+
+<script>
+
+	const globalData=getApp().globalData;
+	import chunleiVideo from '../../componets/chunlei-video/chunlei-video';
+	import scrollMixins from './scrollMixins';
+	import uniEasyInput from "../../components/uni-easyinput/uni-easyinput"
+	import uniPopup from "../../components/uni-popup/uni-popup"
+	import uniPopupShare from "../../components/uni-popup/uni-popup-share";
+	const BindingX = uni.requireNativePlugin('bindingx');
+	const animation = weex.requireModule('animation');
+	const modal = weex.requireModule('modal');
+	
+	export default { 
+		mixins:[scrollMixins],
+		components:{
+			chunleiVideo,
+			uniPopup,
+			uniPopupShare,
+			uniEasyInput
+		},
+		data(){
+			return{
+				other:false,
+				comment:'',
+				replay:'',
+				replay_id:'',
+				send_user_id:'',
+				commentList:[],
+				deleteStatus:false,
+				videoList:[{
+						src:'http://baobab.kaiyanapp.com/api/v1/playUrl?vid=164015&resourceType=video&editionType=default&source=aliyun&playUrlType=url_oss',
+						content:'为什么要选择uni-app？',
+						flag:true,
+						check:false,
+						like:'10w',
+						comment:'1045',
+						avater:'../../static/logo.png',
+						initialTime:20,
+						at:'Dcloud',
+						duration:841,
+						objectFit:''
+					}]
+			}
+		},
+		created(){
+			this.init()
+			//隐藏subnvue
+		},
+		async mounted() {
+			//this.videoPlay(this.index)
+			/* await this.pushVideoList()
+			this.$nextTick(()=>{
+				this.videoPlay(this.index)
+			}) */
+			
+			
+		},
+		onReady() {
+			
+		},
+		async onShow(){
+			await this.pushVideoList()
+			this.$nextTick(()=>{
+				this.videoPlay(this.index)
+			})
+		},
+		onHide(){
+			for (let item of this.videoList) {
+				item.flag = false
+			}
+		},
+		methods:{
+			share(e){
+				console.log(e);
+				console.log('点击');
+				let video=this.videoList[this.index];
+				console.log(video);
+				uni.share({
+				    provider: "weixin",
+				    scene: "WXSceneSession",
+				    type: 0,
+				    href: video.src,
+				    title: video.title,
+				    summary:video.content,
+				    imageUrl: video.avater,
+				    success: function (res) {
+				        console.log("success:" + JSON.stringify(res));
+				    },
+				    fail: function (err) {
+				        console.log("fail:" + JSON.stringify(err));
+				    }
+				});
+			},
+			closePopup(){
+				this.$refs.popup.close();
+			},
+			toReplay(e){
+				e.stopPropagation();
+				let _self=this;
+				let id=this.videoList[this.index].video_id;
+				let user=uni.getStorageSync('user_id')
+				console.log(user);
+				if(!user){
+					uni.showToast({
+						title:'请登陆后评论',
+						icon:'none'
+					})
+				}else{
+					console.log(user);
+					uni.request({
+						method:'POST',
+						url:globalData.api+'/user/save',
+						data:{
+							user_id:user,
+							content:_self.replay,
+							video_id:id,
+							reply_id:_self.replay_id,
+							reply_user_id:_self.send_user_id
+						},
+						success(result) {
+							console.log(result);
+							if(result.data.statusCode===0){
+								uni.showToast({
+									title:'评论成功',
+									icon:'none'
+								})
+								_self.videoList[_self.index].comment+=1;
+								_self.replay_id='',
+								uni.request({
+									method:'POST',
+									url:globalData.api+'/user/comment',
+									data:{
+										id:id,
+									},
+									success(result) {
+										console.log(result)
+										if(result.data.statusCode===0){
+											_self.$refs.popupReplay.close();
+											_self.commentList=result.data.data;
+											
+										}
+									},
+									
+								})
+							}
+						}
+					})
+				}
+			},
+			toComment(replay,send){
+				this.replay_id=replay;
+				this.send_user_id=send;
+				this.$refs.popupReplay.open()
+			},
+			clickbt(){
+				console.log(11)
+			},
+			//设置参数
+			init(){
+				this.typeX = true //开启左右滑动
+				this.playCount = 2 //剩余多少视频加载视频列表
+				this.startDistance = 5 //判断左右上下拖动的启动距离 px
+				this.minTime = 300 //判断快速滑动的时间,该时间内无视回弹距离判断
+				this.backDistance = 200 //判断上下滑动的回弹距离 px
+			},
+			pushVideoList(){
+				console.log('调用')
+				let id=uni.getStorageSync('user_id')
+				let list=[];
+				let _self=this;
+				uni.request({
+					url:globalData.api+'/video/showlist',
+					success(result){
+						console.log(result);
+						if(result.data.statusCode===0){
+							let tempData=result.data.data;
+							tempData.forEach(item=>{
+								let obj={
+									id:item.user_id,
+									video_id:item.id,
+									src:item.url,
+									title:item.title,
+										content:item.desc,
+										flag:false,
+										at:item.user.nickname,
+										avater:item.user.avatar,
+										initialTime:0,
+										duration:841,
+										objectFit:''}
+										obj.comment=item.comment.length
+										 if(item.data.length>=0){
+											 let count=0;
+											 item.data.forEach(item2=>{
+												 if(item2.video_id===item.id){
+												 		count+=1;	
+												 }
+												 if(item2.video_id===item.id && item2.user_id===id){
+													 obj.check=true
+												 }
+											 })
+											 obj.like=count
+										}else{
+											obj.check=false;
+										} 
+										
+										list.push(obj);
+										
+							})
+							_self.videoList=[..._self.videoList,...list];
+						}
+					},
+					fail(err){
+						console.log(err)
+					}
+					
+				})
+				/* let promise = new Promise((resolve,reject)=>{
+					uni.request({
+						url: 'https://api.apiopen.top/videoRecommend?id=127397',
+						success: (res) => {
+							let videoGroup = []
+							for (let item of res.data.result) {
+								if(item.type == 'videoSmallCard'){
+									videoGroup.push({
+										src:item.data.playUrl,
+										content:item.data.title,
+										flag:false,
+										check:false,
+										like:'7w',
+										comment:'1045',
+										at:item.data.author.name,
+										avater:item.data.author.icon,
+										initialTime:0,
+										duration:item.data.duration
+									})
+								}
+							}
+							this.videoList = [...this.videoList,...videoGroup]					
+							resolve()
+						}
+					})
+				}) 
+				return promise */
+			},
+			comments(e){
+				e.stopPropagation();
+				let _self=this;
+				let id=this.videoList[this.index].video_id;
+				let user=uni.getStorageSync('user_id')
+				console.log(user);
+				if(!user){
+					uni.showToast({
+						title:'请登陆后评论',
+						icon:'none'
+					})
+				}else{
+					console.log(user);
+					uni.request({
+						method:'POST',
+						url:globalData.api+'/user/save',
+						data:{
+							user_id:user,
+							content:_self.comment,
+							video_id:id,
+							reply_id:0,
+							reply_user_id:0
+						},
+						success(result) {
+							console.log(result);
+							if(result.data.statusCode===0){
+								uni.showToast({
+									title:'评论成功',
+									icon:'none'
+								})
+								_self.videoList[_self.index].comment+=1;
+								_self.comment='',
+								uni.request({
+									method:'POST',
+									url:globalData.api+'/user/comment',
+									data:{
+										id:id,
+									},
+									success(result) {
+										console.log(result)
+										if(result.data.statusCode===0){
+											_self.commentList=result.data.data;
+											
+										}
+									},
+									
+								})
+							}
+						}
+					})
+				}
+				
+			},
+			tapLove(e){
+				e.stopPropagation();
+				if(this.distanceX!=0) return
+				this.videoList[this.index].check = !this.videoList[this.index].check
+				if(this.videoList[this.index].check===true){
+					this.videoList[this.index].like+=1
+				}else{
+					this.videoList[this.index].like-=1
+				}
+				this.videoList = [...this.videoList]
+				let id=this.videoList[this.index].video_id;
+				let user=uni.getStorageSync('user_id')
+				uni.request({
+					method:'POST',
+					url:globalData.api+'/fava/video',
+					data:{
+						id:user,
+						video_id:id,
+					},
+					success(res) {
+						console.log(res)
+						uni.showToast({
+							title:res.data.data.msg,
+							icon:'none'
+						})
+					},
+					
+				})
+			},
+			tapAvater(e){
+				e.stopPropagation();
+				console.log(e);
+				let id=this.videoList[this.index].id;
+				uni.navigateTo({
+					url:'../other/other?id='+id
+				})
+				if(this.distanceX!=0) return
+				/* uni.showToast({
+					icon:'none',
+					title:`点击索引为${this.index}的头像`
+				}) */
+			},
+			deleteCommentList(comment_id,index){
+				let _self=this;
+				uni.showModal({
+					title:'提示',
+					content:'是否删除该评论',
+					success:(res)=>{
+						if(res.confirm){
+							uni.request({
+								method:'POST',
+								url:globalData.api+'/comment/destory',
+								data:{
+									comment_id,
+								},
+								success(result) {
+									console.log(result)
+									if(result.data.statusCode===0){
+										uni.showToast({
+											title:result.data.data,
+											icon:'none'
+										})
+										_self.getCommentList(_self.videoList[_self.index].video_id)
+										_self.videoList[_self.index].comment-=1
+										if(index===1){
+											
+										}
+									}
+								},
+								
+							})
+						}
+					}
+				})
+				
+			},
+			tapMsg(e){
+				e.stopPropagation();
+				let id=this.videoList[this.index].video_id;
+				let user_id=this.videoList[this.index].id
+				let user=uni.getStorageSync('user_id')
+				if(parseInt(user)===parseInt(user_id)){
+					this.deleteStatus=true
+				}else{
+					this.deleteStatus=false
+				}
+				console.log(this.deleteStatus);
+				this.getCommentList(id)
+				this.$refs.popup.open()
+				if(this.distanceX!=0) return
+				
+			},
+			getCommentList(id){
+				let _self=this;
+				uni.request({
+					method:'POST',
+					url:globalData.api+'/user/comment',
+					data:{
+						id:id,
+					},
+					success(result) {
+						console.log(result)
+						if(result.data.statusCode===0){
+							_self.commentList=result.data.data;
+							
+						}
+					},
+				})
+			},
+			tapShare(e){
+				e.stopPropagation();
+				this.$refs.popupShare.open();
+				if(this.distanceX!=0) return
+				
+			},
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+	.page{
+		flex: 1;
+		overflow: hidden;
+		position: relative;
+	}
+	.swiper{
+		position: relative;
+		background-color: #000;
+	}
+	.left-div{
+		position: absolute;
+		top: 0;
+		justify-content: center;
+		align-items: center;
+	}
+	.right-div{
+		position: absolute;
+		top: 0;
+		justify-content: center;
+		align-items: center;
+	}
+	.title-text{
+		font-size: 16px;
+		color: #000000;
+	}
+	.video-box{
+		position: relative;
+		background-color: #000;
+	}
+	.cover-view-center{
+		
+		position: fixed;
+		justify-content: center;
+		align-items: center;
+		
+		z-index: 999;
+	}
+	.cover-view-top{
+		position: fixed;
+		width: 750rpx;
+		height: 150px;
+		overflow: hidden;
+	}
+	.cover-view-left{
+		position: absolute;
+		margin-left: 10upx;
+		width: 500upx;
+		bottom: 200upx;
+		z-index: 9999;
+		font-size: 16px;
+		color: #FFFFFF;
+	}
+	.left-text{
+		font-size: 16px;
+		color: #FFFFFF;
+		margin-bottom: 20upx;
+	}
+	.avater{
+		border-radius: 50upx;
+		border-color: #fff;
+		border-style: solid;
+		border-width: 2px;
+	}
+	
+	.cover-view-right{
+		position: absolute;
+		top: 400upx;
+		right: 20upx;
+		z-index: 9999;
+	}
+	.right-text-avater{
+		position: absolute;
+		font-size: 14px;
+		top: 80upx;
+		left: 30upx;
+		height: 40upx;
+		width: 40upx;
+		background-color: #DD524D;
+		color: #FFFFFF;
+		border-radius: 50%;
+		text-align: center;
+		line-height: 40upx;
+		z-index: 999;
+	}
+	
+	.avater-icon{
+		height: 40upx;
+		width: 40upx;
+		
+		color: #fff;
+		background-color: #DD524D;
+		border-radius: 50%;
+		position: absolute;
+		left: 30upx;
+		top:-20upx;
+	}
+	
+	.right-text{
+		text-align: center;
+		font-size: 14px;
+		color: #FFFFFF;
+		margin-bottom: 50upx;
+		height: 20px;
+	}
+	.img{
+		height: 100upx;
+		width: 100upx;
+		opacity: 0.9;
+	}
+</style>

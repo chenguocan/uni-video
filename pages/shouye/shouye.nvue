@@ -1,0 +1,29 @@
+<template>
+	<view class="page">		
+		<!-- <video class="video-play" src="http://1304138784.vod2.myqcloud.com/ba1775c9vodcq1304138784/fbcb9ed05285890815870353329/KUucFMi9qagA.mp4" auto-play></video>
+		<video class="video-play" src="http://1304138784.vod2.myqcloud.com/ba1775c9vodcq1304138784/fbcb9ed05285890815870353329/KUucFMi9qagA.mp4" auto-play></video>
+		<video class="video-play" src="http://1304138784.vod2.myqcloud.com/ba1775c9vodcq1304138784/fbcb9ed05285890815870353329/KUucFMi9qagA.mp4" auto-play></video> -->
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				
+			}
+		},
+		methods: {
+			
+		}
+	}
+</script>
+
+<style>
+.page{
+	flex:1;
+},
+.video-play{
+	flex:1;
+}
+</style>

@@ -1,0 +1,220 @@
+{
+	"easycom": {
+		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		 {
+		 	"path": "pages/xxx/xxx",
+		 	"style": {
+		 		"navigationBarTitleText": "uni-app",
+		 		"navigationStyle":"custom"
+		 	}
+		 },{
+			"path": "pages/shouye/shouye",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		
+		},{
+			"path": "pages/index/index",
+			"style": {
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		
+		},{
+			"path": "pages/info/info",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"app-plus":{
+					"titleNView":{
+						"backgroundColor":"#161824"
+					}
+				}
+			}
+		}, {
+			"path": "pages/jiahao/jiahao",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+
+		}, {
+			"path": "pages/register/register",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/xiaoxi/xiaoxi",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}, {
+			"path": "pages/wo/wo",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"app-plus":{
+					"titleNView":false
+				}
+			}
+
+		},
+		{
+			"path": "pages/guanzhu/guanzhu",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false
+			}
+
+		}
+
+		
+
+		, 
+		{
+			"path": "pages/video/video",
+			"style": {
+				"navigationBarTitleText": "",
+				"enablePullDownRefresh": false,
+				"app-plus":{
+					"titleNView":false
+				}
+				
+			}
+		
+		}
+
+
+	    ,{
+            "path" : "pages/myfollow/myfollow",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/followMe/followMe",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/other/other",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/otherFollow/otherFollow",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
+        ,{
+            "path" : "pages/followOther/followOther",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"app-plus":{
+					"titleNView":false
+				}
+            }
+            
+        }
+        ,{
+            "path" : "pages/followOther/followOther",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"app-plus":{
+					"titleNView":false
+				}
+            }
+            
+        }
+        ,{
+            "path" : "pages/info/info",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false,
+				"app-plus":{
+					
+				}
+            }
+            
+        }
+    ],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#DBF1E1"
+	},
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#1296db",
+		"borderStyle": "black",
+		"backgroundColor": "#ffffff",
+		"list": [{
+				"pagePath": "pages/xxx/xxx",
+				"iconPath": "static/icon/shouye.png",
+				"selectedIconPath": "static/icon/shouyeed.png",
+				"text": "首页"
+			},
+			/* {
+						"pagePath": "pages/guanzhu/guanzhu",
+						"iconPath": "static/icon/guanzhu.png",
+						"selectedIconPath": "static/icon/guanzhued.png",
+						"text": "关注"
+					}, */
+			{
+				"pagePath": "pages/jiahao/jiahao",
+				"iconPath": "static/icon/jiahao.png",
+				"selectedIconPath": "static/icon/jiahaoed.png"
+			}
+			/* , {
+						"pagePath": "pages/xiaoxi/xiaoxi",
+						"iconPath": "static/icon/xiaoxi.png",
+						"selectedIconPath": "static/icon/xiaoxied.png",
+						"text": "消息"
+					} */
+			, {
+				"pagePath": "pages/wo/wo",
+				"iconPath": "static/icon/wo.png",
+				"selectedIconPath": "static/icon/woed.png",
+				"text": "我"
+			}
+		]
+	}
+}
